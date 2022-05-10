@@ -1,5 +1,5 @@
 # apeaceofmind 🧠 😌
-Need your peace but everything id so noisy and hotch-potch around you? Something exciting coming up here soon.
+Need your peace but everything is so noisy and hotch-potch around you? Something exciting coming up here soon.
 
 Need more context?
 Sorry, this won't be possible as of now. I think Mr Phoolchand Tripathi, aka 'Munna' can better sun it up.
