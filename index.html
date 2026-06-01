@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GTA San Andreas Radio</title>
+    <style>
+        body {
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+            font-family: 'Pricedown', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            user-select: none;
+        }
+
+        @font-face {
+            font-family: 'Pricedown';
+            src: url('https://db.onlinewebfonts.com/t/2db1c01e63a32fcfc366ff56bc1b8495.woff2') format('woff2');
+        }
+
+        h1 {
+            font-size: 4rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .radio-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1.5rem;
+            width: 80%;
+            max-width: 800px;
+        }
+
+        .station-btn {
+            background-color: #333;
+            border: 2px solid #555;
+            color: #fff;
+            padding: 1rem;
+            font-size: 1.2rem;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-family: inherit;
+        }
+
+        .station-btn:hover {
+            background-color: #444;
+            border-color: #777;
+        }
+
+        .station-btn.active {
+            background-color: #e6a822; /* GTA SA Gold/Yellow */
+            color: #111;
+            border-color: #e6a822;
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(230, 168, 34, 0.5);
+        }
+
+        .controls {
+            margin-top: 3rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        input[type="range"] {
+            width: 200px;
+            accent-color: #e6a822;
+        }
+
+        .station-info {
+            margin-top: 2rem;
+            font-size: 1.5rem;
+            min-height: 2rem;
+            color: #e6a822;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>San Andreas Radio</h1>
+
+    <div class="radio-grid" id="stationContainer">
+        <!-- Stations will be generated here -->
+    </div>
+
+    <div class="station-info" id="currentStation">Tuned Out</div>
+
+    <div class="controls">
+        <label for="volume">Volume</label>
+        <input type="range" id="volume" min="0" max="1" step="0.05" value="0.5">
+    </div>
+
+    <audio id="radioPlayer"></audio>
+
+    <script>
+        const stations = [
+            { name: "Bounce FM", url: "https://archive.org/download/gta-san-andreas-radio-stations/Bounce%20FM.mp3" },
+            { name: "CSR 103.9", url: "https://archive.org/download/gta-san-andreas-radio-stations/CSR%20103.9.mp3" },
+            { name: "K-DST", url: "https://archive.org/download/gta-san-andreas-radio-stations/K-DST.mp3" },
+            { name: "K-Jah West", url: "https://archive.org/download/gta-san-andreas-radio-stations/K-Jah%20West.mp3" },
+            { name: "K-Rose", url: "https://archive.org/download/gta-san-andreas-radio-stations/K-Rose.mp3" },
+            { name: "Master Sounds 98.3", url: "https://archive.org/download/gta-san-andreas-radio-stations/Master%20Sounds%2098.3.mp3" },
+            { name: "Playback FM", url: "https://archive.org/download/gta-san-andreas-radio-stations/Playback%20FM.mp3" },
+            { name: "Radio Los Santos", url: "https://archive.org/download/gta-san-andreas-radio-stations/Radio%20Los%20Santos.mp3" },
+            { name: "Radio X", url: "https://archive.org/download/gta-san-andreas-radio-stations/Radio%20X.mp3" },
+            { name: "SF-UR", url: "https://archive.org/download/gta-san-andreas-radio-stations/SF-UR.mp3" }
+        ];
+
+        const player = document.getElementById('radioPlayer');
+        const container = document.getElementById('stationContainer');
+        const volumeControl = document.getElementById('volume');
+        const currentStationDisplay = document.getElementById('currentStation');
+
+        let currentActiveBtn = null;
+
+        // Initialize Volume
+        player.volume = volumeControl.value;
+
+        // Generate Buttons
+        stations.forEach((station, index) => {
+            const btn = document.createElement('button');
+            btn.className = 'station-btn';
+            btn.textContent = station.name;
+
+            btn.addEventListener('click', () => {
+                // If clicking the active station, turn it off
+                if (currentActiveBtn === btn) {
+                    player.pause();
+                    btn.classList.remove('active');
+                    currentActiveBtn = null;
+                    currentStationDisplay.textContent = 'Tuned Out';
+                    return;
+                }
+
+                // Remove active class from previous
+                if (currentActiveBtn) {
+                    currentActiveBtn.classList.remove('active');
+                }
+
+                // Set new active
+                btn.classList.add('active');
+                currentActiveBtn = btn;
+
+                // Play station
+                player.src = station.url;
+
+                // Random seek to simulate radio
+                player.addEventListener('loadedmetadata', function onLoaded() {
+                    if (player.duration !== Infinity && !isNaN(player.duration)) {
+                        player.currentTime = Math.random() * player.duration;
+                    }
+                    player.removeEventListener('loadedmetadata', onLoaded);
+                });
+
+                player.play().catch(e => console.error("Playback failed", e));
+                currentStationDisplay.textContent = `Playing: ${station.name}`;
+            });
+
+            container.appendChild(btn);
+        });
+
+        // Volume control
+        volumeControl.addEventListener('input', (e) => {
+            player.volume = e.target.value;
+        });
+
+        // Loop audio when it ends to simulate continuous radio
+        player.addEventListener('ended', () => {
+             player.currentTime = 0;
+             player.play();
+        });
+
+    </script>
+</body>
+</html>
