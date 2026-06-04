@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GTA San Andreas Radio</title>
+    <title>GTA Radio Hub</title>
     <style>
         body {
             background-color: #1a1a1a;
@@ -83,11 +83,22 @@
             min-height: 2rem;
             color: #e6a822;
         }
+
+        .game-header {
+            grid-column: 1 / -1;
+            font-size: 2rem;
+            color: #e6a822;
+            text-align: center;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            border-bottom: 1px solid #555;
+            padding-bottom: 0.5rem;
+        }
     </style>
 </head>
 <body>
 
-    <h1>San Andreas Radio</h1>
+    <h1>GTA Radio Hub</h1>
 
     <div class="radio-grid" id="stationContainer">
         <!-- Stations will be generated here -->
@@ -103,18 +114,74 @@
     <audio id="radioPlayer"></audio>
 
     <script>
-        const stations = [
-            { name: "Bounce FM", url: "https://archive.org/download/gta-san-andreas-radio-stations/Bounce%20FM.mp3" },
-            { name: "CSR 103.9", url: "https://archive.org/download/gta-san-andreas-radio-stations/CSR%20103.9.mp3" },
-            { name: "K-DST", url: "https://archive.org/download/gta-san-andreas-radio-stations/K-DST.mp3" },
-            { name: "K-Jah West", url: "https://archive.org/download/gta-san-andreas-radio-stations/K-Jah%20West.mp3" },
-            { name: "K-Rose", url: "https://archive.org/download/gta-san-andreas-radio-stations/K-Rose.mp3" },
-            { name: "Master Sounds 98.3", url: "https://archive.org/download/gta-san-andreas-radio-stations/Master%20Sounds%2098.3.mp3" },
-            { name: "Playback FM", url: "https://archive.org/download/gta-san-andreas-radio-stations/Playback%20FM.mp3" },
-            { name: "Radio Los Santos", url: "https://archive.org/download/gta-san-andreas-radio-stations/Radio%20Los%20Santos.mp3" },
-            { name: "Radio X", url: "https://archive.org/download/gta-san-andreas-radio-stations/Radio%20X.mp3" },
-            { name: "SF-UR", url: "https://archive.org/download/gta-san-andreas-radio-stations/SF-UR.mp3" }
-        ];
+        const stationsByGame = {
+            "GTA San Andreas": [
+                { name: "Bounce FM", url: "https://archive.org/download/gta-san-andreas-radio-stations/Bounce%20FM.mp3" },
+                { name: "CSR 103.9", url: "https://archive.org/download/gta-san-andreas-radio-stations/CSR%20103.9.mp3" },
+                { name: "K-DST", url: "https://archive.org/download/gta-san-andreas-radio-stations/K-DST.mp3" },
+                { name: "K-Jah West", url: "https://archive.org/download/gta-san-andreas-radio-stations/K-Jah%20West.mp3" },
+                { name: "K-Rose", url: "https://archive.org/download/gta-san-andreas-radio-stations/K-Rose.mp3" },
+                { name: "Master Sounds 98.3", url: "https://archive.org/download/gta-san-andreas-radio-stations/Master%20Sounds%2098.3.mp3" },
+                { name: "Playback FM", url: "https://archive.org/download/gta-san-andreas-radio-stations/Playback%20FM.mp3" },
+                { name: "Radio Los Santos", url: "https://archive.org/download/gta-san-andreas-radio-stations/Radio%20Los%20Santos.mp3" },
+                { name: "Radio X", url: "https://archive.org/download/gta-san-andreas-radio-stations/Radio%20X.mp3" },
+                { name: "SF-UR", url: "https://archive.org/download/gta-san-andreas-radio-stations/SF-UR.mp3" }
+            ],
+            "GTA Vice City": [
+                { "name": "Emotion 98.3", "url": "https://archive.org/download/gtavcrs/Emotion%2098.3.mp3" },
+                { "name": "Fever 105", "url": "https://archive.org/download/gtavcrs/Fever%20105.mp3" },
+                { "name": "Flash FM", "url": "https://archive.org/download/gtavcrs/Flash%20FM.mp3" },
+                { "name": "K-Chat", "url": "https://archive.org/download/gtavcrs/K-Chat.mp3" },
+                { "name": "Radio Espantoso", "url": "https://archive.org/download/gtavcrs/Radio%20Espantoso.mp3" },
+                { "name": "V-Rock", "url": "https://archive.org/download/gtavcrs/V-Rock.mp3" },
+                { "name": "VCPR", "url": "https://archive.org/download/gtavcrs/VCPR.mp3" },
+                { "name": "Wave 103", "url": "https://archive.org/download/gtavcrs/Wave%20103.mp3" },
+                { "name": "Wildstyle", "url": "https://archive.org/download/gtavcrs/Wildstyle.mp3" }
+            ],
+            "GTA IV": [
+                { "name": "Electro-Choc", "url": "https://archive.org/download/GTA_iv_Radio/Electro-Choc.mp3" },
+                { "name": "Integrity 2.0", "url": "https://archive.org/download/GTA_iv_Radio/Integrity%202.0.mp3" },
+                { "name": "Jazz Nation Radio 108.5", "url": "https://archive.org/download/GTA_iv_Radio/Jazz%20Nation%20Radio%20108.5.mp3" },
+                { "name": "K109 The Studio", "url": "https://archive.org/download/GTA_iv_Radio/K109%20The%20Studio.mp3" },
+                { "name": "Liberty City Hardcore", "url": "https://archive.org/download/GTA_iv_Radio/Liberty%20City%20Hardcore.mp3" },
+                { "name": "Liberty Rock Radio", "url": "https://archive.org/download/GTA_iv_Radio/Liberty%20Rock%20Radio.mp3" },
+                { "name": "Massive B Soundsystem 96.9", "url": "https://archive.org/download/GTA_iv_Radio/Massive%20B%20Soundsystem%2096.9.mp3" },
+                { "name": "Public Liberty Radio", "url": "https://archive.org/download/GTA_iv_Radio/Public%20Liberty%20Radio.mp3" },
+                { "name": "Radio Broker", "url": "https://archive.org/download/GTA_iv_Radio/Radio%20Broker.mp3" },
+                { "name": "RamJam FM", "url": "https://archive.org/download/GTA_iv_Radio/RamJam%20FM.mp3" },
+                { "name": "San Juan Sounds", "url": "https://archive.org/download/GTA_iv_Radio/San%20Juan%20Sounds.mp3" },
+                { "name": "Self-Actualization FM", "url": "https://archive.org/download/GTA_iv_Radio/Self-Actualization%20FM.mp3" },
+                { "name": "The Beat 102.7", "url": "https://archive.org/download/GTA_iv_Radio/The%20Beat%20102.7.mp3" },
+                { "name": "The Classics 104.1", "url": "https://archive.org/download/GTA_iv_Radio/The%20Classics%20104.1.mp3" },
+                { "name": "The Journey", "url": "https://archive.org/download/GTA_iv_Radio/The%20Journey.mp3" },
+                { "name": "The Vibe 98.8", "url": "https://archive.org/download/GTA_iv_Radio/The%20Vibe%2098.8.mp3" },
+                { "name": "Tuff Gong Radio", "url": "https://archive.org/download/GTA_iv_Radio/Tuff%20Gong%20Radio.mp3" },
+                { "name": "Vice City FM", "url": "https://archive.org/download/GTA_iv_Radio/Vice%20City%20FM.mp3" },
+                { "name": "Vladivostok FM", "url": "https://archive.org/download/GTA_iv_Radio/Vladivostok%20FM.mp3" },
+                { "name": "WKTT Radio", "url": "https://archive.org/download/GTA_iv_Radio/WKTT%20Radio.mp3" }
+            ],
+            "GTA V": [
+                { "name": "Blaine County Radio", "url": "https://archive.org/download/GTAVRadioStations/GTA%20V%20Radio%20Stations/Blaine%20County%20Radio.mp3" },
+                { "name": "Blonded Radio", "url": "https://archive.org/download/GTAVRadioStations/GTA%20V%20Radio%20Stations/Blonded%20Radio.mp3" },
+                { "name": "Blue Ark", "url": "https://archive.org/download/GTAVRadioStations/GTA%20V%20Radio%20Stations/Blue%20Ark.mp3" },
+                { "name": "Channel X", "url": "https://archive.org/download/GTAVRadioStations/GTA%20V%20Radio%20Stations/Channel%20X.mp3" },
+                { "name": "East Los FM", "url": "https://archive.org/download/GTAVRadioStations/GTA%20V%20Radio%20Stations/East%20Los%20FM.mp3" },
+                { "name": "FlyLo FM", "url": "https://archive.org/download/GTAVRadioStations/GTA%20V%20Radio%20Stations/FlyLo%20FM.mp3" },
+                { "name": "Los Santos Rock Radio", "url": "https://archive.org/download/GTAVRadioStations/GTA%20V%20Radio%20Stations/Los%20Santos%20Rock%20Radio.mp3" },
+                { "name": "Los Santos Underground Radio", "url": "https://archive.org/download/GTAVRadioStations/GTA%20V%20Radio%20Stations/Los%20Santos%20Underground%20Radio.mp3" },
+                { "name": "Non-Stop-Pop FM", "url": "https://archive.org/download/GTAVRadioStations/GTA%20V%20Radio%20Stations/Non-Stop-Pop%20FM.mp3" },
+                { "name": "Radio Los Santos", "url": "https://archive.org/download/GTAVRadioStations/GTA%20V%20Radio%20Stations/Radio%20Los%20Santos.mp3" },
+                { "name": "Radio Mirror Park", "url": "https://archive.org/download/GTAVRadioStations/GTA%20V%20Radio%20Stations/Radio%20Mirror%20Park.mp3" },
+                { "name": "Rebel Radio", "url": "https://archive.org/download/GTAVRadioStations/GTA%20V%20Radio%20Stations/Rebel%20Radio.mp3" },
+                { "name": "Soulwax FM", "url": "https://archive.org/download/GTAVRadioStations/GTA%20V%20Radio%20Stations/Soulwax%20FM.mp3" },
+                { "name": "Space 103.2", "url": "https://archive.org/download/GTAVRadioStations/GTA%20V%20Radio%20Stations/Space%20103.2.mp3" },
+                { "name": "The Lab", "url": "https://archive.org/download/GTAVRadioStations/GTA%20V%20Radio%20Stations/The%20Lab.mp3" },
+                { "name": "Vinewood Boulevard Radio", "url": "https://archive.org/download/GTAVRadioStations/GTA%20V%20Radio%20Stations/Vinewood%20Boulevard%20Radio.mp3" },
+                { "name": "West Coast Classics", "url": "https://archive.org/download/GTAVRadioStations/GTA%20V%20Radio%20Stations/West%20Coast%20Classics.mp3" },
+                { "name": "West Coast Talk Radio", "url": "https://archive.org/download/GTAVRadioStations/GTA%20V%20Radio%20Stations/West%20Coast%20Talk%20Radio.mp3" },
+                { "name": "WorldWide FM", "url": "https://archive.org/download/GTAVRadioStations/GTA%20V%20Radio%20Stations/WorldWide%20FM.mp3" }
+            ]
+        };
 
         const player = document.getElementById('radioPlayer');
         const container = document.getElementById('stationContainer');
@@ -127,47 +194,55 @@
         player.volume = volumeControl.value;
 
         // Generate Buttons
-        stations.forEach((station, index) => {
-            const btn = document.createElement('button');
-            btn.className = 'station-btn';
-            btn.textContent = station.name;
+        for (const [gameName, gameStations] of Object.entries(stationsByGame)) {
+            // Create game header
+            const header = document.createElement('h2');
+            header.className = 'game-header';
+            header.textContent = gameName;
+            container.appendChild(header);
 
-            btn.addEventListener('click', () => {
-                // If clicking the active station, turn it off
-                if (currentActiveBtn === btn) {
-                    player.pause();
-                    btn.classList.remove('active');
-                    currentActiveBtn = null;
-                    currentStationDisplay.textContent = 'Tuned Out';
-                    return;
-                }
+            gameStations.forEach((station, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'station-btn';
+                btn.textContent = station.name;
 
-                // Remove active class from previous
-                if (currentActiveBtn) {
-                    currentActiveBtn.classList.remove('active');
-                }
-
-                // Set new active
-                btn.classList.add('active');
-                currentActiveBtn = btn;
-
-                // Play station
-                player.src = station.url;
-
-                // Random seek to simulate radio
-                player.addEventListener('loadedmetadata', function onLoaded() {
-                    if (player.duration !== Infinity && !isNaN(player.duration)) {
-                        player.currentTime = Math.random() * player.duration;
+                btn.addEventListener('click', () => {
+                    // If clicking the active station, turn it off
+                    if (currentActiveBtn === btn) {
+                        player.pause();
+                        btn.classList.remove('active');
+                        currentActiveBtn = null;
+                        currentStationDisplay.textContent = 'Tuned Out';
+                        return;
                     }
-                    player.removeEventListener('loadedmetadata', onLoaded);
+
+                    // Remove active class from previous
+                    if (currentActiveBtn) {
+                        currentActiveBtn.classList.remove('active');
+                    }
+
+                    // Set new active
+                    btn.classList.add('active');
+                    currentActiveBtn = btn;
+
+                    // Play station
+                    player.src = station.url;
+
+                    // Random seek to simulate radio
+                    player.addEventListener('loadedmetadata', function onLoaded() {
+                        if (player.duration !== Infinity && !isNaN(player.duration)) {
+                            player.currentTime = Math.random() * player.duration;
+                        }
+                        player.removeEventListener('loadedmetadata', onLoaded);
+                    });
+
+                    player.play().catch(e => console.error("Playback failed", e));
+                    currentStationDisplay.textContent = `Playing: ${station.name} (${gameName})`;
                 });
 
-                player.play().catch(e => console.error("Playback failed", e));
-                currentStationDisplay.textContent = `Playing: ${station.name}`;
+                container.appendChild(btn);
             });
-
-            container.appendChild(btn);
-        });
+        }
 
         // Volume control
         volumeControl.addEventListener('input', (e) => {
