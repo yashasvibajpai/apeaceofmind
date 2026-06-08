@@ -95,6 +95,36 @@
             border-bottom: 1px solid #555;
             padding-bottom: 0.5rem;
         }
+
+        .scrambler-btn {
+            background: linear-gradient(45deg, #ff00ff, #00ffff);
+            border: 2px solid #fff;
+            color: #fff;
+            padding: 1rem 2rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+            border-radius: 8px;
+            text-transform: uppercase;
+            font-family: inherit;
+            letter-spacing: 2px;
+            box-shadow: 0 0 10px rgba(255, 0, 255, 0.5), 0 0 20px rgba(0, 255, 255, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .scrambler-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(255, 0, 255, 0.8), 0 0 25px rgba(0, 255, 255, 0.8);
+        }
+
+        .scrambler-btn.active {
+            animation: pulse 1s infinite alternate;
+            background: linear-gradient(45deg, #00ffff, #ff00ff);
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 10px rgba(255, 0, 255, 0.5), 0 0 20px rgba(0, 255, 255, 0.5); }
+            100% { box-shadow: 0 0 20px rgba(255, 0, 255, 1), 0 0 40px rgba(0, 255, 255, 1); }
+        }
     </style>
 </head>
 <body>
@@ -108,6 +138,7 @@
     <div class="station-info" id="currentStation">Tuned Out</div>
 
     <div class="controls">
+        <button id="scramblerBtn" class="scrambler-btn">📼 Scrambler</button>
         <label for="volume">Volume</label>
         <input type="range" id="volume" min="0" max="1" step="0.05" value="0.5">
     </div>
@@ -188,8 +219,18 @@
         const container = document.getElementById('stationContainer');
         const volumeControl = document.getElementById('volume');
         const currentStationDisplay = document.getElementById('currentStation');
+        const scramblerBtn = document.getElementById('scramblerBtn');
 
         let currentActiveBtn = null;
+        let isScramblerMode = false;
+
+        // Flatten stations for Scrambler mode
+        const allStations = [];
+        for (const [gameName, gameStations] of Object.entries(stationsByGame)) {
+            gameStations.forEach(station => {
+                allStations.push({ ...station, gameName });
+            });
+        }
 
         // Initialize Volume
         player.volume = volumeControl.value;
@@ -208,6 +249,12 @@
                 btn.textContent = station.name;
 
                 btn.addEventListener('click', () => {
+                    // Disable scrambler mode if manual selection is made
+                    if (isScramblerMode) {
+                        isScramblerMode = false;
+                        scramblerBtn.classList.remove('active');
+                    }
+
                     // If clicking the active station, turn it off
                     if (currentActiveBtn === btn) {
                         player.pause();
@@ -250,10 +297,56 @@
             player.volume = e.target.value;
         });
 
-        // Loop audio when it ends to simulate continuous radio
+        function playRandomStation() {
+            if (allStations.length === 0) return;
+
+            // Un-highlight manual selection if any
+            if (currentActiveBtn) {
+                currentActiveBtn.classList.remove('active');
+                currentActiveBtn = null;
+            }
+
+            const randomIndex = Math.floor(Math.random() * allStations.length);
+            const randomStation = allStations[randomIndex];
+
+            player.src = randomStation.url;
+
+            player.addEventListener('loadedmetadata', function onLoaded() {
+                if (player.duration !== Infinity && !isNaN(player.duration)) {
+                    player.currentTime = Math.random() * player.duration;
+                }
+                player.removeEventListener('loadedmetadata', onLoaded);
+            });
+
+            player.play().catch(e => console.error("Playback failed", e));
+            currentStationDisplay.textContent = `Scrambler Mode: ${randomStation.name} (${randomStation.gameName})`;
+        }
+
+        // Scrambler mode logic
+        scramblerBtn.addEventListener('click', () => {
+            isScramblerMode = !isScramblerMode;
+            if (isScramblerMode) {
+                scramblerBtn.classList.add('active');
+                playRandomStation();
+            } else {
+                scramblerBtn.classList.remove('active');
+                player.pause();
+                currentStationDisplay.textContent = 'Tuned Out';
+                if (currentActiveBtn) {
+                    currentActiveBtn.classList.remove('active');
+                    currentActiveBtn = null;
+                }
+            }
+        });
+
+        // Loop audio when it ends to simulate continuous radio, or play random in Scrambler mode
         player.addEventListener('ended', () => {
-             player.currentTime = 0;
-             player.play();
+             if (isScramblerMode) {
+                 playRandomStation();
+             } else {
+                 player.currentTime = 0;
+                 player.play();
+             }
         });
 
     </script>
